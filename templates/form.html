@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Account Detector</title>
+
+    <!-- CSS only -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+    <style>
+        .bisque {
+            background-color: #eef0f2;
+        }
+
+    </style>
+    <nav class="navbar navbar-light bisque">
+        <div class="container-fluid">
+          <a class="navbar-brand d-flex align-items-center justify-content-between" href="#" >
+            <i class="bi bi-instagram" class="mr-3"  style="font-size: 2rem; color:black;"></i>
+            &nbsp
+             Fake Account Detector
+          </a>
+        </div>
+    </nav>
+    <br>
+    <br>
+    <div class="container">
+        <br>
+        <div class="row">
+            <div class="col-3"></div>
+            <form action="/submit" method="get" class="col-6">
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Please enter a username:</label>
+                  <input type="text" class="form-control" id="exampleInputEmail1" name="user">
+                </div>
+                <button type="submit" class="btn btn-primary" value="submit">Submit</button>
+             </form>
+             <div class="col-3"></div>
+        </div> 
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
