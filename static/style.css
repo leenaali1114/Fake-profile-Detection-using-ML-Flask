@@ -1,0 +1,684 @@
+Skip to content
+DEV Community
+Search...
+
+Log in
+Create account
+
+2
+Jump to Comments
+7
+Save
+
+Phylis Jepchumba
+Phylis Jepchumba
+Posted on Jul 26, 2022
+
+
+6
+
+3
+Login/Registration Form with Python Flask and MySQL.
+#
+python
+#
+webdev
+#
+database
+#
+programming
+Requirements
+Download and install Python, for this tutorial I'll be using Python 3.9.
+
+Download and install MySQL Community Server and MySQL Workbench. You can skip this step if you already have a MySQL server installed.
+Or download it here
+
+Install Python Flask with the command:
+pip install flask
+Install Flask-MySQLdb with the command:
+pip install flask-mysqldb
+File Structure & Setup
+\-- loginform
+    |-- main.py
+    \-- static
+        |-- style.css
+    \-- templates
+        |-- index.html
+        |-- register.html
+        |-- home.html
+        |-- layout.html
+Creating the Database and setting-up Tables
+Execute the following SQL statements:
+CREATE DATABASE IF NOT EXISTS `LOGIN` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `LOGIN`;
+
+CREATE TABLE IF NOT EXISTS `form` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `username` varchar(50) NOT NULL,
+    `password` varchar(255) NOT NULL,
+    `email` varchar(100) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+INSERT INTO `form` (`id`, `username`, `password`, `email`) VALUES (1, 'test', '1234', 'test@test.com');
+Screenshot (42)
+
+The above SQL statement will create our database LOGIN with the table form, along with a test account that we can use for testing purposes.
+
+Creating the Login Form.
+Import the modules you are going to use in the main.py file as follows;
+from flask import Flask, render_template, request, redirect, url_for, session
+from flask_mysqldb import MySQL
+import MySQLdb.cursors
+import re
+Then create the MySQL and app related variables and configure the MySQL connection details.
+app = Flask(__name__)
+
+app.secret_key = ' key'
+
+# Enter your database connection details below
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'LOGIN'
+
+# Intialize MySQL
+mysql = MySQL(app)
+Create the login page. we will create a new route.
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    # Output message if something goes wrong...
+    msg = ''
+    return render_template('index.html', msg='')
+Creating the Login Template.
+Add the following code to index.html
+!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Login Form</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    </head>
+    <body>
+        <div class="login">
+            <h1>LOGIN</h1>
+            <div class="links">
+                <a href="{{ url_for('login') }}" class="active">LOGIN</a>
+                <a href="{{ url_for('register') }}">REGISTER</a>
+            </div>
+            <form action="" method="post">
+                <label for="username">
+                    <i class="fa fa-user"></i>
+                </label>
+                <input type="text" name="username" placeholder="Username" id="username" required>
+                <label for="password">
+                    <i class="fa fa-lock"></i>
+                </label>
+                <input type="password" name="password" placeholder="Password" id="password" required>
+                <div class="msg">{{ msg }}</div>
+                <input type="submit" value="Login">
+            </form>
+        </div>
+    </body>
+</html>
+Creating the Stylesheet (CSS3).
+Add the following code to style.css
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "segoe ui", roboto, oxygen, ubuntu, cantarell, "fira sans", "droid sans", "helvetica neue", Arial, sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+body {
+    background-color: #435165;
+    margin: 0;
+}
+.login, .register {
+    width: 400px;
+    background-color: #ffffff;
+    box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+    margin: 100px auto;
+}
+.login h1, .register h1 {
+    text-align: center;
+    color: brown;
+    font-size: 24px;
+    padding: 20px 0 20px 0;
+    border-bottom: 1px solid #dee0e4;
+}
+.login .links, .register .links {
+    display: flex;
+    padding: 0 15px;
+}
+.login .links a, .register .links a {
+    color: #adb2ba;
+    text-decoration: none;
+    display: inline-flex;
+    padding: 0 10px 10px 10px;
+    font-weight: bold;
+}
+.login .links a:hover, .register .links a:hover {
+    color: brown;
+}
+.login .links a.active, .register .links a.active {
+    border-bottom: 3px solid brown;
+    color:brown;
+}
+.login form, .register form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 20px;
+}
+.login form label, .register form label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    background-color:brown;
+    color: #ffffff;
+}
+.login form input[type="password"], .login form input[type="text"], .login form input[type="email"], .register form input[type="password"], .register form input[type="text"], .register form input[type="email"] {
+    width: 310px;
+    height: 50px;
+    border: 1px solid #dee0e4;
+    margin-bottom: 20px;
+    padding: 0 15px;
+}
+.login form input[type="submit"], .register form input[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: brown;
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+    transition: background-color 0.2s;
+}
+.login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
+    background-color:brown;
+    transition: background-color 0.2s;
+}
+.navtop {
+    background-color: #2f3947;
+    height: 60px;
+    width: 100%;
+    border: 0;
+}
+.navtop div {
+    display: flex;
+    margin: 0 auto;
+    width: 1000px;
+    height: 100%;
+}
+.navtop div h1, .navtop div a {
+    display: inline-flex;
+    align-items: center;
+}
+.navtop div h1 {
+    flex: 1;
+    font-size: 24px;
+    padding: 0;
+   margin: 0;
+    color: #eaebed;
+    font-weight: normal;
+}
+.navtop div a {
+    padding: 0 20px;
+    text-decoration: none;
+    color: #c1c4c8;
+    font-weight: bold;
+}
+.navtop div a i {
+    padding: 2px 8px 0 0;
+}
+.navtop div a:hover {
+    color: #eaebed;
+}
+body.loggedin {
+    background-color: #f3f4f7;
+}
+If we navigate to http://localhost:5000/login/ in our web browser, it will look like the following:
+
+Screenshot (79)
+
+Authenticating Users with Python.
+Now we can add the authentication code to our login route that we created.
+# Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+The above code uses an if statement to check if the requested method is POST and check if the username and password variables exist in the form request.
+
+If they both exist, the username and password variables will be created and associated with the form variables.
+
+Then add the following code;
+# Check if form exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM form WHERE username = %s AND password = %s', (username, password,))
+        # Fetch one record and return result
+        account = cursor.fetchone()
+The code above will execute a SQL query that will retrieve the account from our form table in our MySQL database. The username and password variables are associated with this query as that is what we will use to find the account.
+# If account exists in form table in our database
+        if account:
+            # Create session data, we can access this data in other routes
+            session['loggedin'] = True
+            session['id'] = account['id']
+            session['username'] = account['username']
+            # Redirect to home page
+            return 'Logged in successfully!'
+        else:
+            # Account doesnt exist or username/password incorrect
+            msg = 'Incorrect username/password!'
+From the code above, if account exists the session variables are declared.
+
+These session variables will be remembered for the user as they will be used to determine if the user is logged-in or not.
+
+If the account doesn't exist, we can simply output the error on the login form.
+
+To make sure everything is working correctly, navigate to http://localhost:5000/login/
+
+Input "test" in the username and "1234" in the password fields, and then click the Login button. You should receive a message that outputs "Logged in successfully!".
+
+Creating the Logout Script.
+For a user to logout, all we have to do is remove the session variables that were created when the user logged-in.
+
+Add the following code to the main.py file:
+@app.route('/login/logout')
+def logout():
+    # Remove session data, this will log the user out
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    # Redirect to login page
+    return redirect(url_for('login'))
+When we navigate to the following URL: http://localhost:5000/login/logout the use is logged out and redirected to the login page.
+
+Creating the Registration System.
+We need a registration system that users can use to register on our.
+We will create a new register route and create the registration template, along with the registration form, input fields.
+
+Registration Template
+
+Add the following code to register.html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Register</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    </head>
+    <body>
+        <div class="register">
+            <h1>Register</h1>
+            <div class="links">
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}" class="active">Register</a>
+            </div>
+            <form action="{{ url_for('register') }}" method="post" autocomplete="off">
+                <label for="username">
+                    <i class="fa fa-user"></i>
+                </label>
+                <input type="text" name="username" placeholder="Username" id="username" required>
+                <label for="password">
+                    <i class="fa fa-lock"></i>
+                </label>
+                <input type="password" name="password" placeholder="Password" id="password" required>
+                <label for="email">
+                    <i class="fa fa-envelope-open"></i>
+                </label>
+                <input type="email" name="email" placeholder="Email" id="email" required>
+                <div class="msg">{{ msg }}</div>
+                <input type="submit" value="Register">
+            </form>
+        </div>
+    </body>
+</html>
+#Registering Users with Python
+Once we have created the registration template we need to register users.
+
+To do this we will create "register" route that will handle the POST request and insert a new account into our form table, but only if the submitted fields are valid.
+
+Add the following code to main.py file;
+def register():
+    # Output message if something goes wrong...
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM form WHERE username = %s', (username,))
+        account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into accounts table
+            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email,))
+            mysql.connection.commit()
+            msg = 'You have successfully registered!'
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+    # Show registration form with message (if any)
+    return render_template('register.html', msg=msg)
+
+We will create the "register" route and add validation that will check if all the form fields exist. If they don't, then output a simple error.
+
+The code above will also select an account with the submitted username and password fields.
+
+If the account doesn't exist, we can proceed to validate the input data. Validation will check if the submitted email is valid and check if the username contains only letters and numbers.
+
+The code will also insert a new account into our form tables.
+
+To test that it is working correctly, navigate to http://localhost:5000/login/register and fill out the form and click the Register button.
+If everything is okay you will receive the following response:
+
+Screenshot (80)
+
+Creating the Home Page.
+The home page will be restricted to logged-in users only. Non-registered users cannot access this page.
+
+Add the following code to main.py file
+@app.route('/login/home')
+def home():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        return render_template('home.html', username=session['username'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+The above code will create the home route function. If the user is logged-in, they will have access to the home page, if not, they will be redirected to the login page.
+
+Create home template.
+Add the following code to home.html
+{% extends 'layout.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2>Welcome to my Blog</h2>
+<p style="color: black;">Welcome back, {{ username }}!. Check out more exciting articles on Python Programming Language.</p>
+<p style="background-color: aqua;text-align: center;font-weight: bolder;"><a href="https://dev.to/phylis/python-101-introduction-to-python-2eh4">Introduction to Python</a></p>
+<p style="background-color: aqua; text-align: center;font-weight: bolder;"><a href="https://dev.to/phylis/introduction-to-control-flow-and-functions-in-python-41cc">Python Functions and Control Flow</a></p>
+<p style="background-color: aqua; text-align: center; font-weight: bolder;"><a href="https://dev.to/phylis/python-classes-and-objects-51on">Python Classes and Objects</a></p>
+
+
+{% endblock %}
+We also need to create the layout for our logged-in pages, edit the layout.html file and add:
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    </head>
+    <body class="loggedin">
+        <nav class="navtop">
+            <div>
+                <h1>@Phy Blog</h1>
+                <a href="{{ url_for('home') }}"><i class="fa fa-home"></i>Home</a>
+
+                <a href="{{ url_for('logout') }}"><i class="fa fa-sign-out"></i>Logout</a>
+            </div>
+        </nav>
+
+
+   </body>
+</html>
+The user will now be redirected to the home page when they log-in.
+
+If we enter the correct details into the login form and click the Login button, we will see the following:
+
+Screenshot (78)
+
+We have now created our login and registration system using Python Flask and MySQL with the following features:
+
+Users can login only if their credentials are present in the database.
+
+Without logging in, user cannot go to next page, even using that particular pages route.
+
+When logged user can go to other pages using routes.
+
+After clicking on logout, the user cannot go next page instead redirected to login form.
+
+If email or username already exist in database, user will not create account.
+
+Top comments (2)
+
+Subscribe
+pic
+Add to the discussion
+ 
+ 
+grayhat profile image
+Mwenda Harun Mbaabu
+•
+Jul 28 '22
+
+Nice article @phylis 🥳🥳🥳
+
+
+1
+ like
+Like
+Reply
+ 
+ 
+phylis profile image
+Phylis Jepchumba 
+•
+Aug 14 '22
+
+Thanks@grayhat
+
+
+1
+ like
+Like
+Reply
+Code of Conduct • Report abuse
+DEV Community
+
+Trending in Database
+In the database community, there's buzz around GraphQL for efficient data fetching and real-time querying with streaming databases. Discussions also highlight various database types, including classic MySQL, and the performance of REPLICA IDENTITY FULL in Postgres.
+
+johnrushx 
+20 databases to pick in 2023 - simplified
+John Rush ・ Jun 9 ・ 8 min read
+#database #tutorial #beginners #backend
+johnrushx 
+SQL, NoSql, and 5 DB types you'll never need
+John Rush ・ Jun 9 ・ 2 min read
+#database #sql #beginners #tutorial
+ryosuke 
+GraphQL for Beginners
+Ryosuke Yano ・ Jun 17 ・ 2 min read
+#database #graphql #nosql #rest
+bobur 
+Query Real-time Data With GraphQL And Streaming Database
+Bobur Umurzokov ・ Jun 10 ・ 8 min read
+#webdev #graphql #database #programming
+Xata 
+On the performance of REPLICA IDENTITY FULL in Postgres
+Tudor Golubenco for Xata ・ Jun 7 ・ 7 min read
+#postgres #performance #database
+Read next
+sip profile image
+introducing new Vercel AI SDK
+Dom Sipowicz - Jun 15
+
+josethz00 profile image
+Math for Devs - Cosine Similarity in Python
+José Thomaz - Jun 14
+
+ruppysuppy profile image
+7 More JavaScript Web APIs to Build Futuristic Websites you didn't Know 🤯
+Tapajyoti Bose - Jun 25
+
+ymc9 profile image
+Implementing Flexible Authorization in RedwoodJS Projects
+ymc9 - Jun 22
+
+
+Phylis Jepchumba
+Follow
+Software Engineer|| Technical writer|| Data Scientist|| Tag Moderator @DevCommunity
+LOCATION
+Nairobi,Kenya
+EDUCATION
+Strathmore University( Master of Science in Data Science and Analytics)
+JOINED
+Jul 21, 2021
+More from Phylis Jepchumba
+Scikit-Learn Code Snippets for Common Machine Learning Tasks: A Comprehensive Guide for Beginners
+#machinelearning #python #datascience #beginners
+Exploring the World of Machine Learning: Definition, Types, Applications, and Upcoming Trends for 2023.
+#machinelearning #python #100daysofcode
+How to Perform Exploratory Data Analysis with Python
+#python #datascience #womenintech #analytics
+DEV Community
+
+The most important JavaScript conversations happen on DEV
+
+"Those who ignore history are doomed to repeat it"
+React vs Signals
+
+☝️ Ryan Carniato and Dan Abramov discuss React fundamentals!
+
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "segoe ui", roboto, oxygen, ubuntu, cantarell, "fira sans", "droid sans", "helvetica neue", Arial, sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+body {
+    background-color: #435165;
+    margin: 0;
+}
+.login, .register {
+    width: 400px;
+    background-color: #ffffff;
+    box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+    margin: 100px auto;
+}
+.login h1, .register h1 {
+    text-align: center;
+    color: brown;
+    font-size: 24px;
+    padding: 20px 0 20px 0;
+    border-bottom: 1px solid #dee0e4;
+}
+.login .links, .register .links {
+    display: flex;
+    padding: 0 15px;
+}
+.login .links a, .register .links a {
+    color: #adb2ba;
+    text-decoration: none;
+    display: inline-flex;
+    padding: 0 10px 10px 10px;
+    font-weight: bold;
+}
+.login .links a:hover, .register .links a:hover {
+    color: brown;
+}
+.login .links a.active, .register .links a.active {
+    border-bottom: 3px solid brown;
+    color:brown;
+}
+.login form, .register form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 20px;
+}
+.login form label, .register form label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    background-color:brown;
+    color: #ffffff;
+}
+.login form input[type="password"], .login form input[type="text"], .login form input[type="email"], .register form input[type="password"], .register form input[type="text"], .register form input[type="email"] {
+    width: 310px;
+    height: 50px;
+    border: 1px solid #dee0e4;
+    margin-bottom: 20px;
+    padding: 0 15px;
+}
+.login form input[type="submit"], .register form input[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: brown;
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+    transition: background-color 0.2s;
+}
+.login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
+    background-color:brown;
+    transition: background-color 0.2s;
+}
+.navtop {
+    background-color: #2f3947;
+    height: 60px;
+    width: 100%;
+    border: 0;
+}
+.navtop div {
+    display: flex;
+    margin: 0 auto;
+    width: 1000px;
+    height: 100%;
+}
+.navtop div h1, .navtop div a {
+    display: inline-flex;
+    align-items: center;
+}
+.navtop div h1 {
+    flex: 1;
+    font-size: 24px;
+    padding: 0;
+   margin: 0;
+    color: #eaebed;
+    font-weight: normal;
+}
+.navtop div a {
+    padding: 0 20px;
+    text-decoration: none;
+    color: #c1c4c8;
+    font-weight: bold;
+}
+.navtop div a i {
+    padding: 2px 8px 0 0;
+}
+.navtop div a:hover {
+    color: #eaebed;
+}
+body.loggedin {
+    background-color: #f3f4f7;
+}

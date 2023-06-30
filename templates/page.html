@@ -10,15 +10,52 @@
     <!-- CSS only -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+<style>
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #333;
+    }
+    
+    li {
+      float: left;
+    }
+    
+    li a {
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+    
+    li a:hover:not(.active) {
+      background-color: #111;
+    }
+    
+    .active {
+      background-color: #04AA6D;
+    }
+
+    .bisque {
+            background-color: #eef0f2;
+        }
+    </style>
+
+
 </head>
 
 <body>
-    <style>
-        .bisque {
-            background-color: #eef0f2;
-        }
+    
 
-    </style>
+<ul>
+    <li><a  href="/home">Home</a></li>
+    <li><a class="active" href="/insta">Instagram</a></li>
+    <li><a href="/matrimony">Matrimony</a></li>
+  </ul>
     <nav class="navbar navbar-light bisque">
         <div class="container-fluid">
           <a class="navbar-brand d-flex align-items-center justify-content-between" href="#" >
